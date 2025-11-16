@@ -1,6 +1,7 @@
 ---@diagnostic disable: undefined-field, lowercase-global, param-type-mismatch
 local Bells = {}
 local IsLoaded = false
+local IsRinging = false
 
 CreateThread(function()
     while not NetworkIsSessionStarted() do
@@ -68,7 +69,14 @@ function Klingel(faction, label)
         return print("[FS_BELLS] >> Bells are not loaded")
     end
 
+    if (IsRinging) then
+        return Notify("error", "Information", "Warte kurz, bevor du erneut klingeln kannst!")
+    end
+
+    IsRinging = true
+
     PlayAnim("anim@apt_trans@buzzer", "buzz_reg", 5000, function()
+        SetTimeoutNow()
         ESX.TriggerServerCallback("fs_bells:frakklingel:klingel", function(cbdata)
             if (cbdata.success) then
                 Notify("info", "Information", cbdata.message)
@@ -76,6 +84,12 @@ function Klingel(faction, label)
                 Notify("error", "Information", cbdata.message)
             end
         end, faction, label)
+    end)
+end
+
+function SetTimeoutNow()
+    SetTimeout(FS_BELLS.settings.timeout * 1000, function()
+        IsRinging = false
     end)
 end
 
