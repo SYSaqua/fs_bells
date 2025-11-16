@@ -1,6 +1,7 @@
 FS_BELLS = {
     settings = {
         load_delay = 5000,
+        timeout = 15, -- Sekunden
         command = "bells",
         controls = {
             ["E"] = 38,
